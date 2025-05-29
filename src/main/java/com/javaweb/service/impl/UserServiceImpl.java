@@ -18,7 +18,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        System.out.println(">>> Email nhận từ request: " + request.getEmail());
         Optional<UserEntity> userOpt = userRepo.findByEmail(request.getEmail());
         if (userOpt.isPresent() && userOpt.get().getPassword().equals(request.getPassword())) {
             return new LoginResponse(true, "Login success");
