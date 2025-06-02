@@ -1,21 +1,24 @@
 package com.javaweb.repository.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
+//@AllArgsConstructor
+//@NoArgsConstructor
 @Table(name = "\"User\"")
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // hoặc AUTO
     @Column(name = "UserID")
     private Integer userId;
 
-    @Column(name = "PassWord", nullable = false, length = 255)
+    @Column(name = "pass_word", nullable = false, length = 255)
     private String password;
 
     @Column(name = "first_name", length = 255)
@@ -24,9 +27,9 @@ public class UserEntity {
     @Column(name = "last_name", length = 255)
     private String lastName;
 
-
-    @Column(name = "birthday")
-    private LocalDate birthday;
+//
+//    @Column(name = "birthday")
+//    private LocalDate birthday;
 
     @Column(name = "phone", length = 20)
     private String phone;
@@ -34,30 +37,45 @@ public class UserEntity {
     @Column(name = "email", length = 255)
     private String email;
 
-    @Column(name = "CreatedArt")
-    private LocalDateTime createdArt;
+//    @Column(name = "CreatedArt")
+//    private LocalDateTime createdArt;
 
 //    @Column(name = "ImgPath", length = 255)
 //    private String imgPath;
-
-    @Column(name = "RoleID")
-    private Integer roleId;
+//
+    @ManyToOne
+    @JoinColumn(name = "RoleID", referencedColumnName = "RoleID")
+    private RoleEntity roleId;
 
     public Integer getUserId() {
         return userId;
     }
 
+    public UserEntity() {
+        // Constructor mặc định không tham số
+    }
+
+    public UserEntity(String firstName, String lastName, String email, String phone, String password, RoleEntity role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.password = password;
+        this.roleId = role;
+    }
+
+
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public LocalDateTime getCreatedArt() {
-        return createdArt;
-    }
-
-    public void setCreatedArt(LocalDateTime createdArt) {
-        this.createdArt = createdArt;
-    }
+//    public LocalDateTime getCreatedArt() {
+//        return createdArt;
+//    }
+//
+//    public void setCreatedArt(LocalDateTime createdArt) {
+//        this.createdArt = createdArt;
+//    }
 
     public String getEmail() {
         return email;
@@ -75,13 +93,13 @@ public class UserEntity {
         this.phone = phone;
     }
 
-    public LocalDate getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday;
-    }
+//    public LocalDate getBirthday() {
+//        return birthday;
+//    }
+//
+//    public void setBirthday(LocalDate birthday) {
+//        this.birthday = birthday;
+//    }
 
     public String getLastName() {
         return lastName;
@@ -99,15 +117,15 @@ public class UserEntity {
         this.firstName = firstName;
     }
 
-    public Integer getRoleId() {
+    public RoleEntity getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(Integer roleId) {
+    public void setRoleId(RoleEntity roleId) {
         this.roleId = roleId;
     }
 
-//    public String getImgPath() {
+    //    public String getImgPath() {
 //        return imgPath;
 //    }
 //
