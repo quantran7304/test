@@ -4,10 +4,9 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
-@Table(name = "\"User\"")
+@Table(name = "User")
 public class UserEntity {
 
     @Id
@@ -15,7 +14,7 @@ public class UserEntity {
     @Column(name = "UserID")
     private Integer userId;
 
-    @Column(name = "PassWord", nullable = false, length = 255)
+    @Column(name = "pass_word", nullable = false, length = 255)
     private String password;
 
     @Column(name = "first_name", length = 255)
@@ -23,7 +22,6 @@ public class UserEntity {
 
     @Column(name = "last_name", length = 255)
     private String lastName;
-
 
     @Column(name = "birthday")
     private LocalDate birthday;
@@ -34,15 +32,14 @@ public class UserEntity {
     @Column(name = "email", length = 255)
     private String email;
 
-    @Column(name = "CreatedArt")
-    private LocalDateTime createdArt;
+    @Column(name = "createDate")
+    private LocalDateTime createDate;
 
-//    @Column(name = "ImgPath", length = 255)
-//    private String imgPath;
+    @ManyToOne
+    @JoinColumn(name = "RoleID", referencedColumnName = "RoleID")
+    private RoleEntity role;
 
-    @Column(name = "RoleID")
-    private Integer roleId;
-
+    // Getters và setters
     public Integer getUserId() {
         return userId;
     }
@@ -51,44 +48,12 @@ public class UserEntity {
         this.userId = userId;
     }
 
-    public LocalDateTime getCreatedArt() {
-        return createdArt;
+    public String getPassword() {
+        return password;
     }
 
-    public void setCreatedArt(LocalDateTime createdArt) {
-        this.createdArt = createdArt;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public LocalDate getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFirstName() {
@@ -99,27 +64,51 @@ public class UserEntity {
         this.firstName = firstName;
     }
 
-    public Integer getRoleId() {
-        return roleId;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setRoleId(Integer roleId) {
-        this.roleId = roleId;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-//    public String getImgPath() {
-//        return imgPath;
-//    }
-//
-//    public void setImgPath(String imgPath) {
-//        this.imgPath = imgPath;
-//    }
-
-    public String getPassword() {
-        return password;
+    public LocalDate getBirthday() {
+        return birthday;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
+    }
+
+    public RoleEntity getRole() {
+        return role;
+    }
+
+    public void setRole(RoleEntity role) {
+        this.role = role;
     }
 }
