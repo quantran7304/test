@@ -1,6 +1,11 @@
 package com.javaweb.repository.entity;
 
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 @Entity
 @Table(name = "Role")
 public class RoleEntity {
@@ -9,8 +14,10 @@ public class RoleEntity {
     @Column(name = "RoleID")
     private Integer roleId;
 
+    @Column(name = "RoleName")
     private String roleName;
 
+    @Column(name = "Description")
     private String description;
 
     public Integer getRoleId() {
