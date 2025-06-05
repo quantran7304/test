@@ -1,16 +1,20 @@
 package com.javaweb.repository.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "User")
+//@AllArgsConstructor
+//@NoArgsConstructor
+@Table(name = "\"User\"")
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // hoặc AUTO
     @Column(name = "UserID")
     private Integer userId;
 
@@ -23,8 +27,9 @@ public class UserEntity {
     @Column(name = "last_name", length = 255)
     private String lastName;
 
-    @Column(name = "birthday")
-    private LocalDate birthday;
+//
+//    @Column(name = "birthday")
+//    private LocalDate birthday;
 
     @Column(name = "phone", length = 20)
     private String phone;
@@ -43,6 +48,20 @@ public class UserEntity {
     public Integer getUserId() {
         return userId;
     }
+
+    public UserEntity() {
+        // Constructor mặc định không tham số
+    }
+
+    public UserEntity(String firstName, String lastName, String email, String phone, String password, RoleEntity role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.password = password;
+        this.roleId = role;
+    }
+
 
     public void setUserId(Integer userId) {
         this.userId = userId;
@@ -64,16 +83,24 @@ public class UserEntity {
         this.firstName = firstName;
     }
 
-    public String getLastName() {
-        return lastName;
+    public RoleEntity getRoleId() {
+        return roleId;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setRoleId(RoleEntity roleId) {
+        this.roleId = roleId;
     }
 
-    public LocalDate getBirthday() {
-        return birthday;
+    //    public String getImgPath() {
+//        return imgPath;
+//    }
+//
+//    public void setImgPath(String imgPath) {
+//        this.imgPath = imgPath;
+//    }
+
+    public String getPassword() {
+        return password;
     }
 
     public void setBirthday(LocalDate birthday) {

@@ -9,9 +9,6 @@ import java.util.Date;
 
 public class UserDTO {
 
-        private int userID;
-
-
         private String password;
 
 
@@ -21,17 +18,21 @@ public class UserDTO {
         private String lastName;
 
 
-        private Date birthday;
+//        private Date birthday;
 
         private String phone;
 
         private String email;
 
 
-        private String role;
+//        private String role;
 
 
-        private Date createdArt;
+//        private Date createdArt;
+
+        public UserDTO() {
+
+        }
 
         public String getEmail() {
                 return email;
@@ -41,22 +42,22 @@ public class UserDTO {
                 this.email = email;
         }
 
-        public Date getCreatedArt() {
-                return createdArt;
-        }
+//        public Date getCreatedArt() {
+//                return createdArt;
+//        }
+//
+//        public void setCreatedArt(Date createdArt) {
+//                this.createdArt = createdArt;
+//        }
 
-        public void setCreatedArt(Date createdArt) {
-                this.createdArt = createdArt;
-        }
+//        public String getRole() {
+//                return role;
+//        }
 
-        public String getRole() {
-                return role;
-        }
-
-        public void setRole(String role) {
-                this.role = role;
-        }
-
+//        public void setRole(String role) {
+//                this.role = role;
+//        }
+//
         public String getPhone() {
                 return phone;
         }
@@ -64,14 +65,14 @@ public class UserDTO {
         public void setPhone(String phone) {
                 this.phone = phone;
         }
-
-        public Date getBirthday() {
-                return birthday;
-        }
-
-        public void setBirthday(Date birthday) {
-                this.birthday = birthday;
-        }
+//
+//        public Date getBirthday() {
+//                return birthday;
+//        }
+//
+//        public void setBirthday(Date birthday) {
+//                this.birthday = birthday;
+//        }
 
         public String getLastName() {
                 return lastName;
@@ -97,12 +98,4 @@ public class UserDTO {
                 this.password = password;
         }
 
-        public int getUserID() {
-                return userID;
-        }
-
-        public void setUserID(int userID) {
-                this.userID = userID;
-        }
-        
 }
