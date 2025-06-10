@@ -1,4 +1,7 @@
 package com.javaweb.model;
+import java.util.List;
+
+
 
 public class PropertyDTO {
 
@@ -18,10 +21,19 @@ public class PropertyDTO {
     private String landType;
     private String legalStatus;
     private String imgURL;
-    private String googleMapEmbedUrl; // Dùng để hiển thị bản đồ
+    private String purpose;
+    private String price; // Thêm trường price
+    private List<String> images;
 
-    // ======= Getters & Setters =======
+    public List<String> getImages() {
+        return images;
+    }
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
 
+
+    // Getters and Setters
     public Integer getPropertyID() {
         return propertyID;
     }
@@ -150,11 +162,19 @@ public class PropertyDTO {
         this.imgURL = imgURL;
     }
 
-    public String getGoogleMapEmbedUrl() {
-        return googleMapEmbedUrl;
+    public String getPurpose() {
+        return purpose;
     }
 
-    public void setGoogleMapEmbedUrl(String googleMapEmbedUrl) {
-        this.googleMapEmbedUrl = googleMapEmbedUrl;
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
     }
 }
