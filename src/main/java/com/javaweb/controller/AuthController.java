@@ -95,6 +95,67 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/sendOtp")
+    public ResponseEntity<?> sendOtp(@RequestBody EmailRequest emailRequest) {
+        try {
+            System.out.println("Received from FE: " + emailRequest);
+
+
+            // Gửi OTP qua email và kiểm tra nếu email tồn tại
+            boolean isOtpSent = googleAuthService.sendOtpToEmail(emailRequest.getEmail());
+
+
+            // Trả về boolean và message cho frontend
+            if (isOtpSent) {
+                return ResponseEntity.ok(Map.of("success", true, "message", "OTP sent to your email."));
+            } else {
+                return ResponseEntity.ok(Map.of("success", false, "message", "Email is not registered. Please sign up first."));
+            }
+        } catch (Exception e) {
+            // Trả về thông báo lỗi nếu có ngoại lệ
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Error sending OTP."));
+        }
+    }
+
+
+
+
+
+
+    @PostMapping("/verify-gmail")
+    public ResponseEntity<?> verifyOtp(@RequestBody OTPRequest otpRequest) {
+        boolean isVerified = googleAuthService.verifyOtp(otpRequest.getEmail(), otpRequest.getOtp());
+
+
+        if (isVerified) {
+            // Trả về success: true và thông báo
+            return ResponseEntity.ok(Map.of("success", true, "message", "OTP verified successfully."));
+        } else {
+            // Trả về success: false và thông báo lỗi
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("success", false, "message", "Invalid or expired OTP."));
+        }
+    }
+
+
+    @GetMapping("/check-phone")
+    public ResponseEntity<?> checkPhoneNumber(@RequestParam String phoneNumber) {
+        try {
+            boolean exists = userService.existsByPhoneNumber(phoneNumber);
+
+
+            if (exists) {
+                return ResponseEntity.ok(Map.of("exists", true,"message", "Phone number exists."));
+            } else {
+                return ResponseEntity.ok(Map.of("exists", false,"message", "Phone number not found."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("exists", false, "message", "Server error occurred."
+                    ));
+        }
+    }
 
 
 
