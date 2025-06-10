@@ -1,9 +1,13 @@
 package com.javaweb.repository.entity;
 
 import jakarta.persistence.*;
+import java.util.List; //
+import java.util.ArrayList;
+
 
 @Entity
 @Table(name = "Property")
+
 public class PropertyEntity {
 
     @Id
@@ -50,15 +54,23 @@ public class PropertyEntity {
     @Column(name = "LandType")
     private String landType;
 
-
     @Column(name = "LegalStatus")
     private String legalStatus;
 
     @Column(name = "ImgURL")
     private String imgURL;
 
-    // ======= Getters and Setters =======
+    @Column(name = "Purpose")
+    private String purpose;
 
+    @Column(name = "Price") // Thêm cột Price
+    private String price;
+
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PropertyImage> images = new ArrayList<>();
+
+
+    // Getters and Setters
     public Integer getPropertyId() {
         return propertyId;
     }
@@ -186,4 +198,23 @@ public class PropertyEntity {
     public void setImgURL(String imgURL) {
         this.imgURL = imgURL;
     }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+
 }
+
