@@ -68,14 +68,18 @@ public class UserServiceImpl implements UserService {
         return userRepo.existsByPhone(covertPhone);
     }
 
+
     public String convertInternationalToLocal(String phoneNumber) {
         if (phoneNumber == null) return null;
+
 
         if (phoneNumber.startsWith("+84")) {
             return "0" + phoneNumber.substring(3);
         }
 
+
         return phoneNumber;
     }
+
 
 }
