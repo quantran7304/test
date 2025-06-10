@@ -1,16 +1,23 @@
 package com.javaweb.model;
 
 
-public class LoginResponse {
+public class AuthResponse {
     private boolean success;
     private String message;
+    private String role;
 
-    public LoginResponse() {
+    public AuthResponse() {
     }
 
-    public LoginResponse(boolean success, String message) {
+    public AuthResponse(boolean success, String message) {
         this.success = success;
         this.message = message;
+    }
+
+    public AuthResponse(boolean success, String message, String role) {
+        this.success = success;
+        this.message = message;
+        this.role = role;
     }
 
     public boolean isSuccess() {
@@ -27,5 +34,13 @@ public class LoginResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
