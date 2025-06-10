@@ -1,15 +1,13 @@
 package com.javaweb.controller;
 
-import com.javaweb.model.GoogleUserInfo;
-import com.javaweb.model.LoginRequest;
-import com.javaweb.model.LoginResponse;
-import com.javaweb.model.UserDTO;
+import com.javaweb.model.*;
 import com.javaweb.service.UserService;
 import com.javaweb.service.impl.GoogleAuthService;
 import com.javaweb.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import java.io.IOException;
@@ -42,20 +40,29 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(userService.login(request));
     }
 
-    @PostMapping("/sign-up")
-    public ResponseEntity<?> register(@RequestBody UserDTO request) {
+    @PostMapping("/signup")
+    public ResponseEntity<AuthResponse> register(@RequestBody UserDTO request) {
         try {
-            userService.registerUser(request);
-            return ResponseEntity.ok("Succes");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            System.out.println("Received from FE: " + request);
+            AuthResponse response = userService.registerUser(request);
+
+            if (response.isSuccess()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.ok(response);
+            }
+
+        } catch (Exception e) {
+            AuthResponse errorResponse = new AuthResponse(false, "Internal server error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
+//Have error
     @GetMapping("/google-login-url")
     public ResponseEntity<?> getGoogleLoginUrl() {
         String state = Base64.getEncoder().encodeToString(frontendRedirectUri.getBytes());
@@ -70,22 +77,28 @@ public class AuthController {
     }
 
     @GetMapping("/oauth2/callback")
-    public void handleGoogleCallback(
-            @RequestParam String code,
-            @RequestParam(required = false) String state,
-            HttpServletResponse response) throws IOException {
+    public ResponseEntity<?> handleGoogleCallback(@RequestParam String code) {
+        try {
+            GoogleUserInfo userInfo = googleAuthService.authenticateWithGoogle(code);
 
-        GoogleUserInfo userInfo = googleAuthService.authenticateWithGoogle(code);
+            if (userInfo == null || userInfo.getEmail() == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Missing email from Google"));
+            }
 
-        if (userInfo == null || userInfo.getEmail() == null) {
-            response.sendRedirect(frontendRedirectUri + "?error=missing_user");
-            return;
+            // Hàm này giờ đã trả GoogleLoginResponse rồi ✅
+            GoogleLoginResponse loginResponse = googleAuthService.findOrCreateGoogleUser(userInfo);
+            return ResponseEntity.ok(loginResponse);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(Map.of("message", "Google authentication failed", "error", e.getMessage()));
         }
-
-        String token = JwtUtil.generateToken(userInfo.getEmail());
-        String redirectUrl = frontendRedirectUri + "?token=" + token;
-        response.sendRedirect(redirectUrl);
     }
 
 
+
+
+
+
 }
+
