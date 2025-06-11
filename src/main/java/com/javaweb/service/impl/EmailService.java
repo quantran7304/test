@@ -11,29 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 @Service
 public class EmailService {
 
-    @Value("${spring.mail.host}")
-    private String mailHost;
-
-    @Value("${spring.mail.port}")
-    private int mailPort;
-
-    @Value("${spring.mail.username}")
-    private String mailUsername;
-
-    @Value("${spring.mail.password}")
-    private String mailPassword;
-
-    public JavaMailSender getJavaMailSender() {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost(mailHost);
-        mailSender.setPort(mailPort);
-        mailSender.setUsername(mailUsername);
-        mailSender.setPassword(mailPassword);
-        return mailSender;
-    }
-
     @Autowired
-    private JavaMailSender javaMailSender; // Spring Boot's email sender
+    private JavaMailSender javaMailSender;
 
     public void sendEmail(String to, String subject, String body) {
         try {
@@ -41,13 +20,16 @@ public class EmailService {
             message.setTo(to);
             message.setSubject(subject);
             message.setText(body);
+            message.setFrom("ourhome391s5@gmail.com");
 
-            // Gửi email
+            System.out.println("Sending email to: " + to);
             javaMailSender.send(message);
-            System.out.println("Email sent successfully to: " + to);  // Log thành công
+            System.out.println("Email sent successfully.");
         } catch (Exception e) {
-            e.printStackTrace();  // Log lỗi nếu có
+            System.err.println("❌ Failed to send email: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Failed to send OTP email.", e);
         }
     }
+
 }

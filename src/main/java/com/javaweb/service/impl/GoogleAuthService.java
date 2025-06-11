@@ -45,6 +45,7 @@ public class GoogleAuthService {
     @Autowired
     private OTPRepositoryImpl OTPRepo;
 
+    @Autowired
     private EmailService emailService;
 
     private String getAccessToken(String code) {
@@ -108,28 +109,28 @@ public class GoogleAuthService {
     @Transactional
     public boolean sendOtpToEmail(String email) {
         if (userRepo.existsByEmail(email)) {
+            // 2. Tạo mã OTP 6 chữ số
+            String otp = String.format("%06d", new Random().nextInt(1_000_000));
+
+            // 3. Xoá mã OTP cũ (nếu có)
+            OTPRepo.deleteByEmail(email);
+
+            // 4. Lưu OTP mới
+            OTPEntity otpCode = new OTPEntity();
+            otpCode.setEmail(email);
+            otpCode.setOtpCode(otp);
+            otpCode.setExpiredAt(LocalDateTime.now().plusMinutes(60));
+            OTPRepo.save(otpCode);
+
+            // 5. Gửi email OTP
+            String subject = "Your Account Verification Code";
+            String body = String.format("Your OTP code is: %s", otp);
+            System.out.println("Sending OTP to email: " + email + " | OTP: " + otp);
+            emailService.sendEmail(email, subject, body);
+            return true;
+        }else{
             return false;
         }
-
-        // 2. Tạo mã OTP 6 chữ số
-        String otp = String.format("%06d", new Random().nextInt(1_000_000));
-
-        // 3. Xoá mã OTP cũ (nếu có)
-        OTPRepo.deleteByEmail(email);
-
-        // 4. Lưu OTP mới
-        OTPEntity otpCode = new OTPEntity();
-        otpCode.setEmail(email);
-        otpCode.setOtpCode(otp);
-        otpCode.setExpiredAt(LocalDateTime.now().plusMinutes(60));
-        OTPRepo.save(otpCode);
-
-        // 5. Gửi email OTP
-        String subject = "Your Account Verification Code";
-        String body = String.format("Your OTP code is: ", otp);
-
-        emailService.sendEmail(email, subject, body);
-        return true;
     }
 
     @Transactional

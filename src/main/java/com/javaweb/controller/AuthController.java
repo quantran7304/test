@@ -99,11 +99,10 @@ public class AuthController {
     public ResponseEntity<?> sendOtp(@RequestBody EmailRequest emailRequest) {
         try {
             System.out.println("Received from FE: " + emailRequest);
-
-
             boolean isOtpSent = googleAuthService.sendOtpToEmail(emailRequest.getEmail());
-
+            System.out.println(isOtpSent);
             if (isOtpSent) {
+
                 return ResponseEntity.ok(Map.of("success", true, "message", "OTP sent to your email."));
             } else {
                 return ResponseEntity.ok(Map.of("success", false, "message", "Email is not registered. Please sign up first."));
@@ -113,11 +112,6 @@ public class AuthController {
                     .body(Map.of("success", false, "message", "Error sending OTP."));
         }
     }
-
-
-
-
-
 
     @PostMapping("/verify-gmail")
     public ResponseEntity<?> verifyOtp(@RequestBody OTPRequest otpRequest) {

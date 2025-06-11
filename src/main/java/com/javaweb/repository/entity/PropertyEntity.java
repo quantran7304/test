@@ -13,7 +13,7 @@ public class PropertyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PropertyID")
-    private Integer propertyId;
+    private Long propertyId;
 
     @Column(name = "Address_Line1")
     private String addressLine1;
@@ -33,7 +33,7 @@ public class PropertyEntity {
     @Column(name = "interior")
     private Double interior;
 
-    @Column(name = "PropertyType")
+    @Column(name = "property_type")
     private String propertyType;
 
     @Column(name = "Num_Bedroom")
@@ -51,10 +51,11 @@ public class PropertyEntity {
     @Column(name = "PrivatePool")
     private Boolean privatePool;
 
-    @Column(name = "LandType")
+    @Column(name = "land_type")
     private String landType;
 
-    @Column(name = "LegalStatus")
+
+    @Column(name = "legal_status")
     private String legalStatus;
 
     @Column(name = "ImgURL")
@@ -63,19 +64,19 @@ public class PropertyEntity {
     @Column(name = "Purpose")
     private String purpose;
 
-    @Column(name = "Price") // Thêm cột Price
-    private String price;
+    @Column(name = "price") // Thêm cột Price
+    private String  price;
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PropertyImage> images = new ArrayList<>();
 
 
     // Getters and Setters
-    public Integer getPropertyId() {
+    public Long getPropertyId() {
         return propertyId;
     }
 
-    public void setPropertyId(Integer propertyId) {
+    public void setPropertyId(Long propertyId) {
         this.propertyId = propertyId;
     }
 
