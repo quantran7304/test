@@ -101,18 +101,14 @@ public class AuthController {
             System.out.println("Received from FE: " + emailRequest);
 
 
-            // Gửi OTP qua email và kiểm tra nếu email tồn tại
             boolean isOtpSent = googleAuthService.sendOtpToEmail(emailRequest.getEmail());
 
-
-            // Trả về boolean và message cho frontend
             if (isOtpSent) {
                 return ResponseEntity.ok(Map.of("success", true, "message", "OTP sent to your email."));
             } else {
                 return ResponseEntity.ok(Map.of("success", false, "message", "Email is not registered. Please sign up first."));
             }
         } catch (Exception e) {
-            // Trả về thông báo lỗi nếu có ngoại lệ
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "message", "Error sending OTP."));
         }

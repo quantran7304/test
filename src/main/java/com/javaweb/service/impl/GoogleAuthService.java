@@ -1,6 +1,13 @@
 package com.javaweb.service.impl;
 
+import com.javaweb.model.GoogleLoginResponse;
 import com.javaweb.model.GoogleUserInfo;
+import com.javaweb.repository.entity.OTPEntity;
+import com.javaweb.repository.entity.RoleEntity;
+import com.javaweb.repository.entity.UserEntity;
+import com.javaweb.repository.impl.OTPRepositoryImpl;
+import com.javaweb.repository.impl.UserRepositoryImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -8,12 +15,18 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+
+import static com.mysql.cj.conf.PropertyKey.logger;
 
 @Service
 public class GoogleAuthService {
@@ -25,6 +38,14 @@ public class GoogleAuthService {
 
     @Value("${google.redirect.uri}")
     private String redirectUri;
+
+    @Autowired
+    private UserRepositoryImpl userRepo;
+
+    @Autowired
+    private OTPRepositoryImpl OTPRepo;
+
+    private EmailService emailService;
 
     private String getAccessToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
@@ -55,5 +76,69 @@ public class GoogleAuthService {
     public GoogleUserInfo authenticateWithGoogle(String code) {
         String accessToken = getAccessToken(code);
         return getUserInfo(accessToken);
+    }
+
+    public GoogleLoginResponse findOrCreateGoogleUser(GoogleUserInfo userInfo) {
+        Optional<UserEntity> userOpt = userRepo.findByEmail(userInfo.getEmail());
+
+        UserEntity user;
+        if (userOpt.isPresent()) {
+            user = userOpt.get();
+        } else {
+
+            user = new UserEntity();
+            user.setEmail(userInfo.getEmail());
+            user.setFirstName(userInfo.getFirstName());
+            user.setLastName(userInfo.getLastName());
+            RoleEntity defaultRole = new RoleEntity();
+            defaultRole.setRoleId(2);
+            user.setRole(defaultRole);
+            userRepo.save(user);
+        }
+
+        GoogleLoginResponse response = new GoogleLoginResponse();
+        response.setSuccess(true);
+        response.setName(user.getFirstName() +" "+ user.getLastName());
+        response.setPicture(user.getImgPath());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRole().getRoleName());
+        return response;
+    }
+
+    @Transactional
+    public boolean sendOtpToEmail(String email) {
+        if (userRepo.existsByEmail(email)) {
+            return false;
+        }
+
+        // 2. Tạo mã OTP 6 chữ số
+        String otp = String.format("%06d", new Random().nextInt(1_000_000));
+
+        // 3. Xoá mã OTP cũ (nếu có)
+        OTPRepo.deleteByEmail(email);
+
+        // 4. Lưu OTP mới
+        OTPEntity otpCode = new OTPEntity();
+        otpCode.setEmail(email);
+        otpCode.setOtpCode(otp);
+        otpCode.setExpiredAt(LocalDateTime.now().plusMinutes(60));
+        OTPRepo.save(otpCode);
+
+        // 5. Gửi email OTP
+        String subject = "Your Account Verification Code";
+        String body = String.format("Your OTP code is: ", otp);
+
+        emailService.sendEmail(email, subject, body);
+        return true;
+    }
+
+    @Transactional
+    public boolean verifyOtp(String email, String otp) {
+        Optional<OTPEntity> latestOtp = OTPRepo.findLatestOtpByEmail(email);
+        if(!latestOtp.isPresent()){
+            return false;
+        }
+        OTPEntity otpEntity  = latestOtp.get();
+        return otpEntity.getOtpCode().equals(otp);
     }
 }
