@@ -82,16 +82,28 @@ public class AuthController {
             GoogleUserInfo userInfo = googleAuthService.authenticateWithGoogle(code);
             GoogleLoginResponse loginResponse = googleAuthService.findOrCreateGoogleUser(userInfo);
 
+            // ✅ Lấy dữ liệu từ response để đưa về frontend
             String token = loginResponse.getToken();
-            String redirectUrl = frontendRedirectUri + "?token=" + token;
+            String name = URLEncoder.encode(loginResponse.getName(), StandardCharsets.UTF_8);
+            String email = URLEncoder.encode(loginResponse.getEmail(), StandardCharsets.UTF_8);
+            String picture = URLEncoder.encode(loginResponse.getPicture(), StandardCharsets.UTF_8);
+            String role = URLEncoder.encode(loginResponse.getRole(), StandardCharsets.UTF_8);
 
-            response.sendRedirect(redirectUrl); // ✅ Redirect về FE kèm token
+            String redirectUrl = frontendRedirectUri +
+                    "?token=" + token +
+                    "&name=" + name +
+                    "&email=" + email +
+                    "&picture=" + picture +
+                    "&role=" + role;
+
+            response.sendRedirect(redirectUrl);
 
         } catch (Exception e) {
             String redirectUrl = frontendRedirectUri + "?error=" + URLEncoder.encode(e.getMessage(), "UTF-8");
             response.sendRedirect(redirectUrl);
         }
     }
+
 
     @PostMapping("/sendOtp")
     public ResponseEntity<?> sendOtp(@RequestBody EmailRequest emailRequest) {

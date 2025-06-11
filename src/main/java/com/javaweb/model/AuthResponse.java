@@ -5,6 +5,9 @@ public class AuthResponse {
     private boolean success;
     private String message;
     private String role;
+    private String picture;
+    private String email;
+    private String name;
 
     public AuthResponse() {
     }
@@ -18,6 +21,39 @@ public class AuthResponse {
         this.success = success;
         this.message = message;
         this.role = role;
+    }
+
+    public AuthResponse(boolean success, String message, String role, String picture, String email, String name) {
+        this.success = success;
+        this.message = message;
+        this.role = role;
+        this.picture = picture;
+        this.email = email;
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
     }
 
     public boolean isSuccess() {

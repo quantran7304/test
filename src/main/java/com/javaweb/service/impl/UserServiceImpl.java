@@ -28,7 +28,8 @@ public class UserServiceImpl implements UserService {
             String passFe = request.getPassword();
 
             if (passDb != null && passDb.equals(passFe)) {
-                return new AuthResponse(true, "Login success", user.getRole().getRoleName());
+                return new AuthResponse(true, "Login success", user.getRole().getRoleName()
+                        ,user.getImgPath(),user.getEmail(), user.getFirstName() +" "+user.getLastName());
             } else {
                 return new AuthResponse(false, "Invalid credentials");
             }
