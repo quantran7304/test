@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 //@AllArgsConstructor
 //@NoArgsConstructor
-@Table(name = "\"User\"")
+@Table(name = "user")
 public class UserEntity {
 
     @Id
@@ -37,12 +37,16 @@ public class UserEntity {
     @Column(name = "email", length = 255)
     private String email;
 
-    @Column(name = "createDate")
+    @Column(name = "create_date")
     private LocalDateTime createDate;
+
 
     @ManyToOne
     @JoinColumn(name = "RoleID", referencedColumnName = "RoleID")
     private RoleEntity role;
+
+    @Column(name = "img_path")
+    private String imgPath;
 
     // Getters và setters
     public Integer getUserId() {
@@ -59,7 +63,7 @@ public class UserEntity {
         this.email = email;
         this.phone = phone;
         this.password = password;
-        this.roleId = role;
+        this.role = role;
     }
 
 
@@ -84,28 +88,32 @@ public class UserEntity {
     }
 
     public RoleEntity getRoleId() {
-        return roleId;
+        return role;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public void setRoleId(RoleEntity roleId) {
-        this.roleId = roleId;
+        this.role = roleId;
     }
 
-    //    public String getImgPath() {
-//        return imgPath;
+     public String getImgPath() {
+        return imgPath;
+    }
+
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
+    }
+
+//    public void setBirthday(LocalDate birthday) {
+//        this.birthday = birthday;
 //    }
-//
-//    public void setImgPath(String imgPath) {
-//        this.imgPath = imgPath;
-//    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday;
-    }
 
     public String getPhone() {
         return phone;
