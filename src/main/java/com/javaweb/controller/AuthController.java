@@ -77,21 +77,19 @@ public class AuthController {
     }
 
     @GetMapping("/oauth2/callback")
-    public ResponseEntity<?> handleGoogleCallback(@RequestParam String code) {
+    public void handleGoogleCallback(@RequestParam String code, HttpServletResponse response) throws IOException {
         try {
             GoogleUserInfo userInfo = googleAuthService.authenticateWithGoogle(code);
-
-            if (userInfo == null || userInfo.getEmail() == null) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Missing email from Google"));
-            }
-
-            // Hàm này giờ đã trả GoogleLoginResponse rồi ✅
             GoogleLoginResponse loginResponse = googleAuthService.findOrCreateGoogleUser(userInfo);
-            return ResponseEntity.ok(loginResponse);
+
+            String token = loginResponse.getToken();
+            String redirectUrl = frontendRedirectUri + "?token=" + token;
+
+            response.sendRedirect(redirectUrl); // ✅ Redirect về FE kèm token
 
         } catch (Exception e) {
-            return ResponseEntity.status(500)
-                    .body(Map.of("message", "Google authentication failed", "error", e.getMessage()));
+            String redirectUrl = frontendRedirectUri + "?error=" + URLEncoder.encode(e.getMessage(), "UTF-8");
+            response.sendRedirect(redirectUrl);
         }
     }
 

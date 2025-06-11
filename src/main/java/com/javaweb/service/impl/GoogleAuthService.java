@@ -7,6 +7,7 @@ import com.javaweb.repository.entity.RoleEntity;
 import com.javaweb.repository.entity.UserEntity;
 import com.javaweb.repository.impl.OTPRepositoryImpl;
 import com.javaweb.repository.impl.UserRepositoryImpl;
+import com.javaweb.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -48,6 +49,9 @@ public class GoogleAuthService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     private String getAccessToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
 
@@ -86,23 +90,29 @@ public class GoogleAuthService {
         if (userOpt.isPresent()) {
             user = userOpt.get();
         } else {
-
             user = new UserEntity();
             user.setEmail(userInfo.getEmail());
             user.setFirstName(userInfo.getFirstName());
             user.setLastName(userInfo.getLastName());
+
             RoleEntity defaultRole = new RoleEntity();
-            defaultRole.setRoleId(2);
+            defaultRole.setRoleId(2); // Hoặc lấy từ roleRepo nếu cần
             user.setRole(defaultRole);
+
             userRepo.save(user);
         }
 
+        // ✅ Tạo JWT token (giả sử method JwtUtil.generateToken(email, role) đã tồn tại)
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().getRoleName());
+
         GoogleLoginResponse response = new GoogleLoginResponse();
         response.setSuccess(true);
-        response.setName(user.getFirstName() +" "+ user.getLastName());
+        response.setName(user.getFirstName() + " " + user.getLastName());
         response.setPicture(user.getImgPath());
         response.setEmail(user.getEmail());
         response.setRole(user.getRole().getRoleName());
+        response.setToken(token); // ✅ Gán token vào response
+
         return response;
     }
 
