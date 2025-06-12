@@ -1,5 +1,6 @@
 package com.javaweb.service.impl;
 
+import com.javaweb.model.ChangPasswordRequest;
 import com.javaweb.model.LoginRequest;
 import com.javaweb.model.AuthResponse;
 import com.javaweb.model.UserDTO;
@@ -28,8 +29,8 @@ public class UserServiceImpl implements UserService {
             String passFe = request.getPassword();
 
             if (passDb != null && passDb.equals(passFe)) {
-                return new AuthResponse(true, "Login success", user.getRole().getRoleName()
-                        ,user.getImgPath(),user.getEmail(), user.getFirstName() +" "+user.getLastName());
+                return new AuthResponse(user.getUserId(),true, "Login success", user.getRole().getRoleName()
+                        ,user.getImgPath(),user.getEmail(), user.getFirstName() +" "+user.getLastName(),user.getBirthday());
             } else {
                 return new AuthResponse(false, "Invalid credentials");
             }
@@ -82,5 +83,22 @@ public class UserServiceImpl implements UserService {
         return phoneNumber;
     }
 
+    @Override
+    public boolean changePassword(ChangPasswordRequest request) {
+
+        Optional<UserEntity> optionalUser = userRepo.findByEmail(request.getEmail());
+
+        if (optionalUser.isPresent()) {
+            UserEntity user = optionalUser.get();
+
+            if (request.getCurrentPassword().equals(user.getPassword())) {
+                user.setPassword(request.getNewPassword());
+                userRepo.save(user);
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }

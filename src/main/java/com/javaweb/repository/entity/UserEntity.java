@@ -28,8 +28,8 @@ public class UserEntity {
     private String lastName;
 
 //
-//    @Column(name = "birthday")
-//    private LocalDate birthday;
+    @Column(name = "birthday")
+    private LocalDate birthday;
 
     @Column(name = "phone", length = 20)
     private String phone;
@@ -66,6 +66,13 @@ public class UserEntity {
         this.role = role;
     }
 
+    public LocalDate getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
 
     public void setUserId(Integer userId) {
         this.userId = userId;

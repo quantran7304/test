@@ -1,13 +1,17 @@
 package com.javaweb.model;
 
 
+import java.time.LocalDate;
+
 public class AuthResponse {
+    private Integer userID;
     private boolean success;
     private String message;
     private String role;
     private String picture;
     private String email;
     private String name;
+    private LocalDate birthday;
 
     public AuthResponse() {
     }
@@ -23,13 +27,32 @@ public class AuthResponse {
         this.role = role;
     }
 
-    public AuthResponse(boolean success, String message, String role, String picture, String email, String name) {
+
+    public AuthResponse(Integer userID, boolean success, String message, String role, String picture, String email, String name, LocalDate birthday) {
+        this.userID = userID;
         this.success = success;
         this.message = message;
         this.role = role;
         this.picture = picture;
         this.email = email;
         this.name = name;
+        this.birthday = birthday;
+    }
+
+    public LocalDate getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
+
+    public Integer getUserID() {
+        return userID;
+    }
+
+    public void setUserID(Integer userID) {
+        this.userID = userID;
     }
 
     public String getEmail() {
