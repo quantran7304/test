@@ -4,16 +4,28 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class GoogleLoginResponse {
+    private Integer userId;
     private boolean success;
     private String email;
     private String name;
     private String picture;
     private String role;
+    private LocalDate birthday;
     private String token;
+
+    public LocalDate getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
 
     public String getToken() {
         return token;
@@ -21,6 +33,14 @@ public class GoogleLoginResponse {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public boolean isSuccess() {

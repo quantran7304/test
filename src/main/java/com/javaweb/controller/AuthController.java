@@ -157,9 +157,16 @@ public class AuthController {
         }
     }
 
+    @PutMapping("/password")
+    public ResponseEntity<AuthResponse> changePassword(@RequestBody ChangPasswordRequest request) {
+        boolean changed = userService.changePassword(request);
 
-
-
+        if (changed) {
+            return ResponseEntity.ok(new AuthResponse(true, "Password changed successfully."));
+        } else {
+            return ResponseEntity.ok(new AuthResponse(false, "Current password is incorrect."));
+        }
+    }
 
 }
 

@@ -106,12 +106,14 @@ public class GoogleAuthService {
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().getRoleName());
 
         GoogleLoginResponse response = new GoogleLoginResponse();
+        response.setUserId(user.getUserId());
         response.setSuccess(true);
         response.setName(user.getFirstName() + " " + user.getLastName());
         response.setPicture(user.getImgPath());
         response.setEmail(user.getEmail());
         response.setRole(user.getRole().getRoleName());
-        response.setToken(token); // ✅ Gán token vào response
+        response.setBirthday(user.getBirthday());
+        response.setToken(token);
 
         return response;
     }
