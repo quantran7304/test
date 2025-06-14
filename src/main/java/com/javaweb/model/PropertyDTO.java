@@ -18,7 +18,7 @@ public class PropertyDTO {
     private Integer numBathroom;
     private Integer floor;
     private Boolean privatePool;
-    private String landType;
+    private String LandType;
     private String legalStatus;
     private String imgURL;
     private String purpose;
@@ -139,11 +139,11 @@ public class PropertyDTO {
     }
 
     public String getLandType() {
-        return landType;
+        return LandType;
     }
 
     public void setLandType(String landType) {
-        this.landType = landType;
+        this.LandType = landType;
     }
 
     public String getLegalStatus() {
@@ -178,3 +178,4 @@ public class PropertyDTO {
         this.price = price;
     }
 }
+
