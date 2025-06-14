@@ -1,15 +1,13 @@
 package com.javaweb.controller;
 
-import com.javaweb.model.GoogleUserInfo;
-import com.javaweb.model.LoginRequest;
-import com.javaweb.model.LoginResponse;
-import com.javaweb.model.UserDTO;
+import com.javaweb.model.*;
 import com.javaweb.service.UserService;
 import com.javaweb.service.impl.GoogleAuthService;
 import com.javaweb.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import java.io.IOException;
@@ -42,20 +40,29 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(userService.login(request));
     }
 
-    @PostMapping("/sign-up")
-    public ResponseEntity<?> register(@RequestBody UserDTO request) {
+    @PostMapping("/signup")
+    public ResponseEntity<AuthResponse> register(@RequestBody UserDTO request) {
         try {
-            userService.registerUser(request);
-            return ResponseEntity.ok("Succes");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            System.out.println("Received from FE: " + request);
+            AuthResponse response = userService.registerUser(request);
+
+            if (response.isSuccess()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.ok(response);
+            }
+
+        } catch (Exception e) {
+            AuthResponse errorResponse = new AuthResponse(false, "Internal server error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
+//Have error
     @GetMapping("/google-login-url")
     public ResponseEntity<?> getGoogleLoginUrl() {
         String state = Base64.getEncoder().encodeToString(frontendRedirectUri.getBytes());
@@ -70,22 +77,96 @@ public class AuthController {
     }
 
     @GetMapping("/oauth2/callback")
-    public void handleGoogleCallback(
-            @RequestParam String code,
-            @RequestParam(required = false) String state,
-            HttpServletResponse response) throws IOException {
+    public void handleGoogleCallback(@RequestParam String code, HttpServletResponse response) throws IOException {
+        try {
+            GoogleUserInfo userInfo = googleAuthService.authenticateWithGoogle(code);
+            GoogleLoginResponse loginResponse = googleAuthService.findOrCreateGoogleUser(userInfo);
 
-        GoogleUserInfo userInfo = googleAuthService.authenticateWithGoogle(code);
+            // ✅ Lấy dữ liệu từ response để đưa về frontend
+            String token = loginResponse.getToken();
+            String name = URLEncoder.encode(loginResponse.getName(), StandardCharsets.UTF_8);
+            String email = URLEncoder.encode(loginResponse.getEmail(), StandardCharsets.UTF_8);
+            String picture = URLEncoder.encode(loginResponse.getPicture(), StandardCharsets.UTF_8);
+            String role = URLEncoder.encode(loginResponse.getRole(), StandardCharsets.UTF_8);
 
-        if (userInfo == null || userInfo.getEmail() == null) {
-            response.sendRedirect(frontendRedirectUri + "?error=missing_user");
-            return;
+            String redirectUrl = frontendRedirectUri +
+                    "?token=" + token +
+                    "&name=" + name +
+                    "&email=" + email +
+                    "&picture=" + picture +
+                    "&role=" + role;
+
+            response.sendRedirect(redirectUrl);
+
+        } catch (Exception e) {
+            String redirectUrl = frontendRedirectUri + "?error=" + URLEncoder.encode(e.getMessage(), "UTF-8");
+            response.sendRedirect(redirectUrl);
         }
-
-        String token = JwtUtil.generateToken(userInfo.getEmail());
-        String redirectUrl = frontendRedirectUri + "?token=" + token;
-        response.sendRedirect(redirectUrl);
     }
 
 
+    @PostMapping("/sendOtp")
+    public ResponseEntity<?> sendOtp(@RequestBody EmailRequest emailRequest) {
+        try {
+            System.out.println("Received from FE: " + emailRequest);
+            boolean isOtpSent = googleAuthService.sendOtpToEmail(emailRequest.getEmail());
+            System.out.println(isOtpSent);
+            if (isOtpSent) {
+
+                return ResponseEntity.ok(Map.of("success", true, "message", "OTP sent to your email."));
+            } else {
+                return ResponseEntity.ok(Map.of("success", false, "message", "Email is not registered. Please sign up first."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Error sending OTP."));
+        }
+    }
+
+    @PostMapping("/verify-gmail")
+    public ResponseEntity<?> verifyOtp(@RequestBody OTPRequest otpRequest) {
+        boolean isVerified = googleAuthService.verifyOtp(otpRequest.getEmail(), otpRequest.getOtp());
+
+
+        if (isVerified) {
+            // Trả về success: true và thông báo
+            return ResponseEntity.ok(Map.of("success", true, "message", "OTP verified successfully."));
+        } else {
+            // Trả về success: false và thông báo lỗi
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("success", false, "message", "Invalid or expired OTP."));
+        }
+    }
+
+
+    @GetMapping("/check-phone")
+    public ResponseEntity<?> checkPhoneNumber(@RequestParam String phoneNumber) {
+        try {
+            boolean exists = userService.existsByPhoneNumber(phoneNumber);
+
+
+            if (exists) {
+                return ResponseEntity.ok(Map.of("exists", true,"message", "Phone number exists."));
+            } else {
+                return ResponseEntity.ok(Map.of("exists", false,"message", "Phone number not found."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("exists", false, "message", "Server error occurred."
+                    ));
+        }
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<AuthResponse> changePassword(@RequestBody ChangPasswordRequest request) {
+        boolean changed = userService.changePassword(request);
+
+        if (changed) {
+            return ResponseEntity.ok(new AuthResponse(true, "Password changed successfully."));
+        } else {
+            return ResponseEntity.ok(new AuthResponse(false, "Current password is incorrect."));
+        }
+    }
+
 }
+

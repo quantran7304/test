@@ -2,11 +2,13 @@ package com.javaweb.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+@Component
 public class JwtUtil {
 
     // Dùng chuỗi >= 32 ký tự hoặc dùng secretKeyFromString()
@@ -15,14 +17,16 @@ public class JwtUtil {
     // Tạo key từ chuỗi
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET_STRING.getBytes(StandardCharsets.UTF_8));
 
-    public static String generateToken(String email) {
+    public static String generateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("role", role) // ✅ Thêm claim role vào token
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 ngày
-                .signWith(SECRET_KEY, SignatureAlgorithm.HS256) // ✅
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     public static String extractEmail(String token) {
         return Jwts.parserBuilder()
