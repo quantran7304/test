@@ -13,7 +13,7 @@ public class PropertyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PropertyID")
-    private Integer propertyId;
+    private Integer  propertyId;
 
     @Column(name = "Address_Line1")
     private String addressLine1;
@@ -54,7 +54,8 @@ public class PropertyEntity {
     @Column(name = "LandType")
     private String landType;
 
-    @Column(name = "LegalStatus")
+
+    @Column(name = "legal_status")
     private String legalStatus;
 
     @Column(name = "ImgURL")
@@ -63,14 +64,14 @@ public class PropertyEntity {
     @Column(name = "Purpose")
     private String purpose;
 
-    @Column(name = "Price") // Thêm cột Price
-    private String price;
+    @Column(name = "price") // Thêm cột Price
+    private String  price;
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PropertyImage> images = new ArrayList<>();
 
 
-    // Getters and Setters
+
     public Integer getPropertyId() {
         return propertyId;
     }
@@ -142,7 +143,6 @@ public class PropertyEntity {
     public void setNumBedroom(Integer numBedroom) {
         this.numBedroom = numBedroom;
     }
-
     public Integer getNumCompares() {
         return numCompares;
     }
@@ -217,4 +217,3 @@ public class PropertyEntity {
 
 
 }
-
