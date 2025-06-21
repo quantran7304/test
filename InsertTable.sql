@@ -566,6 +566,192 @@ Perfect for living combined with business or long-term investment.',
 NULL, 6);
 SELECT * FROM realestate.listing;
 
+USE RealEstate;
+-- Bảng Reports
+CREATE TABLE Reportsreports (
+    ReportID INT PRIMARY KEY AUTO_INCREMENT,
+    UserID INT,
+    ListingID INT NOT NULL,
+    ReportDate DATETIME NOT NULL,
+    Reason VARCHAR(255) NOT NULL,
+    Comment TEXT,
+    Status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
+    Response TEXT,
+    AdminID INT,
+    ResponseDate DATETIME,
+    FOREIGN KEY (UserID) REFERENCES User(UserID),
+    FOREIGN KEY (ListingID) REFERENCES Listing(Listing_ID),
+    FOREIGN KEY (AdminID) REFERENCES User(UserID)
+);
+
+
+-- Bảng DiscountCode
+CREATE TABLE DiscountCode (
+    DiscountCodeID INT PRIMARY KEY AUTO_INCREMENT,
+    Code VARCHAR(50) NOT NULL UNIQUE,
+    DiscountType ENUM('PERCENTAGE', 'FIXED') NOT NULL,
+    Value DOUBLE NOT NULL,
+    MinPurchase DOUBLE,
+    MaxDiscount DOUBLE,
+    StartDate DATETIME NOT NULL,
+    ExpirationDate DATETIME,
+    UsageLimit INT,
+    UsedCount INT DEFAULT 0,
+    IsActive BOOLEAN NOT NULL DEFAULT TRUE,
+    ListingID INT,
+    FOREIGN KEY (ListingID) REFERENCES Listing(Listing_ID)
+);
+
+-- Bảng UserDiscount
+CREATE TABLE UserDiscount (
+    UserDiscountID INT PRIMARY KEY AUTO_INCREMENT,
+    UserID INT NOT NULL,
+    DiscountCodeID INT NOT NULL,
+    UsedDate DATETIME NOT NULL,
+    DiscountedAmount DOUBLE,
+    FOREIGN KEY (UserID) REFERENCES User(UserID),
+    FOREIGN KEY (DiscountCodeID) REFERENCES DiscountCode(DiscountCodeID),
+    UNIQUE (UserID, DiscountCodeID)
+);
+
+-- Bảng ReportReasons (tùy chọn)
+CREATE TABLE ReportReasons (
+    ReasonID INT PRIMARY KEY AUTO_INCREMENT,
+    ReasonName VARCHAR(255) NOT NULL UNIQUE
+);
+
+INSERT INTO ReportReasons (ReasonName) VALUES
+    ('Spam'),
+    ('Fraud'),
+    ('Inappropriate Content'),
+    ('Other');
+
+-- Cập nhật bảng Listing
+ALTER TABLE Listing
+ADD UserID INT,
+ADD FOREIGN KEY (UserID) REFERENCES User(UserID);
+
+-- Cập nhật bảng PackageMember
+ALTER TABLE PackageMember
+ADD PurchaseDate DATETIME,
+ADD Price DOUBLE;
+
+-- Thêm chỉ mục
+CREATE INDEX idx_property_id ON Listing(PropertyID);
+CREATE INDEX idx_price ON Listing(price);
+CREATE INDEX idx_city ON Property(City);
+CREATE INDEX idx_property_type ON Property(PropertyType);
+CREATE INDEX idx_area ON Property(Area);
+CREATE INDEX idx_user_id ON FavouriteListing(UserID);
+CREATE INDEX idx_listing_id ON FavouriteListing(ListingID);
+CREATE INDEX idx_user_listing ON Reports(UserID, ListingID);
+CREATE INDEX idx_status ON Reports(Status);
+CREATE INDEX idx_code ON DiscountCode(Code);
+CREATE INDEX idx_listing_id ON DiscountCode(ListingID);
+CREATE INDEX idx_user_discount ON UserDiscount(UserID, DiscountCodeID);
+CREATE INDEX idx_user_status ON PackageMember(UserID, Status);
+
+
+ALTER TABLE Listing
+ADD UserID INT,
+ADD FOREIGN KEY (UserID) REFERENCES User(UserID);
+
+CREATE INDEX idx_user_id ON Listing(UserID);
+
+ALTER TABLE DiscountCode
+ADD COLUMN ExpiryDate DATETIME;
+
+SHOW TABLES;
+SELECT COUNT(*) AS user_count FROM user;
+SELECT COUNT(*) AS listing_count FROM listing;
+SELECT COUNT(*) AS property_count FROM property;
+SELECT COUNT(*) AS property_images_count FROM property_images;
+SELECT COUNT(*) AS favouritelisting_count FROM favouritelisting;
+SELECT COUNT(*) AS reports_count FROM reports;
+SELECT COUNT(*) AS reportreasons_count FROM reportreasons;
+SELECT COUNT(*) AS packagemember_count FROM packagemember;
+SELECT COUNT(*) AS discountcode_count FROM discountcode;
+
+DESCRIBE user;
+DESCRIBE listing;
+DESCRIBE property;
+DESCRIBE property_images;
+DESCRIBE favouritelisting;
+DESCRIBE reports;
+DESCRIBE reportreasons;
+DESCRIBE packagemember;
+DESCRIBE discountcode;
+
+-- Thêm mã giảm giá (thành công)
+INSERT INTO discountcode (DiscountCodeID, Code, DiscountType, Value, MinPurchase, MaxDiscount, StartDate, ExpiryDate, UsageLimit, UsedCount, IsActive, ListingID) VALUES
+(1, 'DISCOUNT10', 'PERCENTAGE', 10.0, 50.0, 100.0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 100, 0, 1, 1),
+(2, 'FIXED5', 'FIXED', 5.0, 20.0, 10.0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 50, 0, 1, 2);
+
+-- Thêm mã giảm giá hết hạn (thất bại)
+INSERT INTO discountcode (DiscountCodeID, Code, DiscountType, Value, MinPurchase, MaxDiscount, StartDate, ExpiryDate, UsageLimit, UsedCount, IsActive, ListingID) VALUES
+(3, 'EXPIRED10', 'PERCENTAGE', 10.0, 50.0, 100.0, '2024-01-01 00:00:00', '2024-12-31 23:59:59', 100, 0, 1, 1); -- Thất bại: ExpiryDate hết hạn
+
+-- Thêm trường hợp biên (Value vượt MaxDiscount)
+INSERT INTO discountcode (DiscountCodeID, Code, DiscountType, Value, MinPurchase, MaxDiscount, StartDate, ExpiryDate, UsageLimit, UsedCount, IsActive, ListingID) VALUES
+(4, 'OVERMAX', 'PERCENTAGE', 150.0, 50.0, 100.0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 100, 0, 1, 1); -- Biên: Value > MaxDiscount
+
+-- Thêm trường hợp đạt UsageLimit
+INSERT INTO discountcode (DiscountCodeID, Code, DiscountType, Value, MinPurchase, MaxDiscount, StartDate, ExpiryDate, UsageLimit, UsedCount, IsActive, ListingID) VALUES
+(5, 'LIMITED', 'PERCENTAGE', 10.0, 50.0, 100.0, '2025-01-01 00:00:00', '2025-12-31 23:59:59', 1, 1, 1, 1); -- Biên: UsedCount = UsageLimit
+ALTER TABLE PackageMember
+ADD COLUMN PackageMemberID INT AUTO_INCREMENT UNIQUE;
+
+SELECT * FROM membership;
+
+USE RealEstate;
+SELECT * FROM packagemember WHERE UserID = 1;
+
+INSERT INTO membership (MembershipID, Type, Price, Description) VALUES
+(1, 'Standard', 100.0, 'Basic membership plan');
+
+INSERT INTO packagemember (UserID, MembershipID, StartDate, EndDate, Status, PurchaseDate, Price) VALUES
+(1, 1, '2025-01-01', '2025-12-31', 'active', '2025-01-01 00:00:00', 100.0);
+
+INSERT INTO membership (MembershipID, Type, Price, Description) VALUES
+(2, 'Expired', 50.0, 'Expired membership plan');
+
+INSERT INTO packagemember (UserID, MembershipID, StartDate, EndDate, Status, PurchaseDate, Price) VALUES
+(2, 2, '2024-01-01', '2024-12-31', 'expired', '2024-01-01 00:00:00', 50.0);
+
+SELECT * FROM packagemember WHERE UserID = 1;
+
+USE RealEstate;
+SELECT * FROM user;
+SELECT * FROM listing;
+SELECT * FROM Favouritelisting;
+INSERT INTO FavouriteListing (FavouriteID, UserID, ListingID) VALUES
+(1, 1, 1), -- John Doe thêm Listing_ID=1
+(2, 2, 2); -- Jane Smith thêm Listing_ID=2
+
+SELECT * FROM property;
+
+INSERT INTO DiscountCode (code, DiscountType, DiscountValue, ExpiryDate, MaxUses, UsedCount, IsActive) VALUES
+('SAVE15', 'percentage', 15.0, '2025-12-31 23:59:59', 5, 0, 1),
+('SAVE20', 'percentage', 20.0, '2025-12-31 23:59:59', 3, 0, 1),
+('FIXED100', 'fixed', 100.0, '2025-12-31 23:59:59', 10, 0, 1),
+('HALFOFF', 'percentage', 50.0, '2025-06-30 23:59:59', 2, 0, 1),
+('FREESHIP', 'fixed', 0.0, '2025-12-31 23:59:59', 5, 0, 1); -- Mã miễn phí vận chuyển (giảm 0, có thể dùng để test logic)
+
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE DiscountCode SET UsedCount = 0;
+
+SET SQL_SAFE_UPDATES = 1;
+
+DELETE FROM DiscountUsage WHERE UserID = 1 AND DiscountCodeID = (SELECT DiscountCodeID FROM DiscountCode WHERE code = 'SAVE10');
+
+SELECT * FROM DiscountUsage WHERE UserID = 1;
+
+SELECT UserID FROM user;
+
+
+
+
 
 
 
