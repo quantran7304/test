@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
-    Optional<ListingEntity> findByPropertyId(Long propertyId);
+public interface ListingRepository extends JpaRepository<ListingEntity, Integer> {
+    Optional<ListingEntity> findByPropertyId(Integer propertyId);
 }

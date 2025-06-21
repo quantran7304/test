@@ -73,7 +73,7 @@ public class PropertyEntity {
 
 
     public Integer getPropertyId() {
-        return propertyId;
+        return Integer.valueOf(propertyId);
     }
 
     public void setPropertyId(Integer propertyId) {
@@ -207,9 +207,21 @@ public class PropertyEntity {
         this.purpose = purpose;
     }
 
-    public String getPrice() {
-        return price;
+    public Double getPrice() {
+        if (price == null || price.trim().isEmpty()) return null;
+        try {
+            String numeric = price.replaceAll("[^0-9.]", ""); // Lấy phần số
+            if (numeric.isEmpty()) return null;
+            double value = Double.parseDouble(numeric);
+            if (price.toLowerCase().contains("million")) value *= 1000000;
+            else if (price.toLowerCase().contains("billion")) value *= 1000000000;
+            return value;
+        } catch (NumberFormatException e) {
+            return null; // Trả về null nếu không chuyển đổi được
+        }
     }
+
+
 
     public void setPrice(String price) {
         this.price = price;

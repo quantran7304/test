@@ -5,7 +5,7 @@ import java.util.List;
 
 public class PropertyDTO {
 
-    private Long propertyID;
+    private Integer propertyID;
     private String addressLine1;
     private String addressLine2;
     private String region;
@@ -22,7 +22,7 @@ public class PropertyDTO {
     private String legalStatus;
     private String imgURL;
     private String purpose;
-    private String price; // Thêm trường price
+    private Double price; // Thêm trường price
     private List<String> images;
 
     public List<String> getImages() {
@@ -34,11 +34,11 @@ public class PropertyDTO {
 
 
     // Getters and Setters
-    public Long getPropertyID() {
+    public Integer getPropertyID() {
         return propertyID;
     }
 
-    public void setPropertyID(Long propertyID) {
+    public void setPropertyID(Integer propertyID) {
         this.propertyID = propertyID;
     }
 
@@ -170,11 +170,11 @@ public class PropertyDTO {
         this.purpose = purpose;
     }
 
-    public String getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 }
