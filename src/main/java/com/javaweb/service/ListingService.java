@@ -16,7 +16,7 @@ public class ListingService {
     @Autowired
     private ListingRepository listingRepository;
 
-    public Optional<ListingDTO> getListingByPropertyId(Long propertyId) {
+    public Optional<ListingDTO> getListingByPropertyId(Integer propertyId) {
         Optional<ListingEntity> entity = listingRepository.findByPropertyId(propertyId);
         return entity.map(this::convertToDTO);
     }
